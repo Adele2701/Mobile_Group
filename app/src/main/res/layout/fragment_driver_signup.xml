@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@drawable/screen_background"
+    tools:context=".driverSignupFragment">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="60dp"
+            android:alpha="0.75"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="25dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Driver Details"
+                    android:textAlignment="center"
+                    android:textColor="@color/dark_moderate_blue"
+                    android:textSize="38sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/driver_icNum"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/custom_edittext"
+                    android:drawableLeft="@drawable/ic_baseline_person_24"
+                    android:drawablePadding="8dp"
+                    android:hint="IC Number"
+                    android:inputType="number"
+                    android:digits="0123456789-"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:singleLine="true"/>
+
+                <EditText
+                    android:id="@+id/driver_studentID"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/custom_edittext"
+                    android:drawableLeft="@drawable/ic_baseline_id_24"
+                    android:drawablePadding="8dp"
+                    android:hint="Student ID"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:singleLine="true"/>
+
+                <EditText
+                    android:id="@+id/driver_carPlateNum"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/custom_edittext"
+                    android:drawableLeft="@drawable/ic_baseline_numbers_24"
+                    android:drawablePadding="8dp"
+                    android:hint="Car Plate Number"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:singleLine="true"/>
+
+                <EditText
+                    android:id="@+id/driver_carModel"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/custom_edittext"
+                    android:drawableLeft="@drawable/ic_baseline_reserve_24"
+                    android:drawablePadding="8dp"
+                    android:hint="Car Model"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:singleLine="true"/>
+
+                <EditText
+                    android:id="@+id/driver_carColour"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/custom_edittext"
+                    android:drawableLeft="@drawable/ic_baseline_palette_24"
+                    android:drawablePadding="8dp"
+                    android:hint="Car Colour"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:singleLine="true"/>
+
+                <TextView
+                    android:id="@+id/message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="**IC number and student ID are uneditable upon signed-up."/>
+
+                <Button
+                    android:id="@+id/signup_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="30dp"
+                    android:backgroundTint="@color/dark_moderate_blue"
+                    android:paddingHorizontal="30dp"
+                    android:paddingVertical="15dp"
+                    android:text="Sign Up"
+                    android:textSize="18sp"
+                    app:cornerRadius="30dp" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

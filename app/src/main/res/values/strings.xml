@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Carpool</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="appName">UniRide</string>
+    <string name="namePlaceholder">Welcome, Guest</string>
+    <string name="menuIntro">Your journey starts with just clicks away!</string>
+    <string name="tv_to">To?</string>
+    <string name="tv_from">From?</string>
+    <string name="to_desc"><i>Your destination address</i></string>
+    <string name="from_desc"><i>The address that you\'re currently at</i></string>
+    <string name="get_driver">Get Your Dedicated Driver</string>
+    <string name="req_login">Login now to view</string>
+    <string name="ride_anytime">Ride at anytime, anywhere</string>
+    <string name="book">Book</string>
+    <string name="name_placeholder">Jason Lee Chia Shen</string>
+    <string name="car_model"  >Model:</string>
+    <string name="car_colour" >Color:</string>
+    <string name = "car_plate">Plate:</string>
+    <string name = "summary_driver">Driver:</string>
+    <string name = "summary_from">From:</string>
+    <string name = "summary_to">To:</string>
+    <string name = "summary_custom">Custom Request:</string>
+    <string name = "summary_schedule">Date &amp; Time:</string>
+    <string name = "choose_driver">Choose your driver</string>
+    <string name = "tv_appoint_sche">Date &amp; Time</string>
+    <string name = "tv_cust_req">Custom Request</string>
+    <string name = "tv_phone">Call driver</string>
+    <string name = "exp_plate">PQB 3456</string>
+    <string name = "exp_car_color">Red</string>
+    <string name = "exp_car_model">Honda City</string>
+    <string name = "set">Set</string>
+    <string name = "exp_long_text">12, Taman Bandar Baru, Bandar Baru Kampar, Kampar, Perak</string>
+    <string name = "exp_date_and_time">Tue Sep 05, 2023 7:55PM</string>
+    <string name = "exp_custom_req">Drop me off at the entrance</string>
+    <string name = "status">Status:</string>
+    <string name = "exp_status">Pending</string>
+    <string name = "history_guest">Log in now to view your history</string>
+</resources>

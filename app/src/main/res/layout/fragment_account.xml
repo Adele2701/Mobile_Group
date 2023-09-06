@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/screen_background"
+    tools:context=".AccountFragment">
+
+    <ImageView
+        android:id="@+id/profileImg"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/ic_baseline_profilepic_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/driverBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_baseline_verified_24"
+        android:drawablePadding="4dp"
+        android:text="Driver"
+        android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/profileImg"
+        app:layout_constraintStart_toStartOf="@+id/profileImg"
+        app:layout_constraintTop_toBottomOf="@+id/profileImg" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="10dp"
+        android:alpha="0.70"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="25dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/driverBadge">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textSize="22sp"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:textColor="@color/dark_moderate_blue"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Name"
+                    android:textColor="@color/dark_moderate_blue"
+                    android:textSize="18sp"/>
+
+                <TextView
+                    android:id="@+id/accountName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/moderate_blue"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="8dp"
+                android:alpha="0.5"
+                android:background="@color/dark_moderate_blue" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/gender"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Gender"
+                    android:textColor="@color/dark_moderate_blue"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/accountGender"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Not set"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/moderate_blue"
+                    android:textColorHint="@color/gray"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="8dp"
+                android:alpha="0.5"
+                android:background="@color/dark_moderate_blue" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/phoneNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Phone number"
+                    android:textColor="@color/dark_moderate_blue"
+                    android:textSize="18sp"/>
+
+                <TextView
+                    android:id="@+id/accountPhoneNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Not set"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/moderate_blue"
+                    android:textColorHint="@color/gray"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/manage_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="60dp"
+        android:src="@drawable/ic_baseline_manage_accounts_24"
+        app:elevation="25dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/logout_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:elevation="25dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/manage_fab"
+        app:layout_constraintEnd_toEndOf="@+id/manage_fab"
+        app:layout_constraintStart_toStartOf="@+id/manage_fab"
+        app:srcCompat="@drawable/ic_baseline_logout_24" />
+
+    <TextView
+        android:id="@+id/logout_action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="Logout"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/logout_fab"
+        app:layout_constraintEnd_toStartOf="@+id/logout_fab"
+        app:layout_constraintTop_toTopOf="@+id/logout_fab" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/signupDriver_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:elevation="25dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/logout_fab"
+        app:layout_constraintEnd_toEndOf="@+id/logout_fab"
+        app:layout_constraintStart_toStartOf="@+id/logout_fab"
+        app:srcCompat="@drawable/ic_baseline_business_24" />
+
+    <TextView
+        android:id="@+id/signupDriver_action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="Sign up as driver"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/signupDriver_fab"
+        app:layout_constraintEnd_toStartOf="@+id/signupDriver_fab"
+        app:layout_constraintTop_toTopOf="@+id/signupDriver_fab" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/editDriver_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:elevation="25dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/editProfile_fab"
+        app:layout_constraintEnd_toEndOf="@+id/editProfile_fab"
+        app:layout_constraintStart_toStartOf="@+id/editProfile_fab"
+        app:srcCompat="@drawable/ic_baseline_edit_note_24"/>
+
+    <TextView
+        android:id="@+id/editDriver_action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="Edit driver profile"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/editDriver_fab"
+        app:layout_constraintEnd_toStartOf="@+id/editDriver_fab"
+        app:layout_constraintTop_toTopOf="@+id/editDriver_fab" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addEmergency_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:elevation="25dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/signupDriver_fab"
+        app:layout_constraintEnd_toEndOf="@+id/signupDriver_fab"
+        app:layout_constraintStart_toStartOf="@+id/signupDriver_fab"
+        app:srcCompat="@drawable/ic_baseline_person_add_24" />
+
+    <TextView
+        android:id="@+id/addEmergency_action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="Emergency contact"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/addEmergency_fab"
+        app:layout_constraintEnd_toStartOf="@+id/addEmergency_fab"
+        app:layout_constraintTop_toTopOf="@+id/addEmergency_fab" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/editProfile_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:elevation="25dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/addEmergency_fab"
+        app:layout_constraintEnd_toEndOf="@+id/addEmergency_fab"
+        app:layout_constraintStart_toStartOf="@+id/addEmergency_fab"
+        app:srcCompat="@drawable/ic_baseline_edit_24" />
+
+    <TextView
+        android:id="@+id/editProfile_action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="Edit profile"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/editProfile_fab"
+        app:layout_constraintEnd_toStartOf="@+id/editProfile_fab"
+        app:layout_constraintTop_toTopOf="@+id/editProfile_fab"/>
+
+    <ProgressBar
+        android:id="@+id/loading_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="130dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
