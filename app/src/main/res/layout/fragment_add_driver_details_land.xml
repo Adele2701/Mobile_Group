@@ -99,6 +99,19 @@
                     app:layout_constraintTop_toBottomOf="@id/displayLc" />
 
                 <ImageView
+                    android:layout_width="200dp"
+                    android:layout_height="112dp"
+                    android:layout_marginTop="50dp"
+                    android:alpha="0.6"
+                    android:background="@drawable/upload_img"
+                    app:layout_constraintBottom_toBottomOf="@id/select_image"
+                    app:layout_constraintEnd_toEndOf="@id/select_image"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@id/select_image"
+                    app:layout_constraintTop_toTopOf="@id/select_image"
+                    app:layout_constraintVertical_bias="0.2" />
+
+                <ImageView
                     android:id="@+id/select_image"
                     android:layout_width="match_parent"
                     android:layout_height="250dp"
@@ -108,6 +121,16 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/camera" />
+
+                <TextView
+                    android:id="@+id/show"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/select_image" />
 
                 <TextView
                     android:id="@+id/message"
@@ -125,7 +148,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Car Insurance:"
+                    android:text="Road tax:"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"
                     app:layout_constraintTop_toBottomOf="@id/message" />
@@ -152,12 +175,24 @@
                     app:layout_constraintLeft_toRightOf="@id/camera2"
                     app:layout_constraintTop_toBottomOf="@id/displayRoad" />
 
+                <ImageView
+                    android:layout_width="200dp"
+                    android:layout_height="112dp"
+                    android:layout_marginTop="50dp"
+                    android:alpha="0.6"
+                    android:background="@drawable/upload_img"
+                    app:layout_constraintBottom_toBottomOf="@id/select_image2"
+                    app:layout_constraintEnd_toEndOf="@id/select_image2"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@id/select_image2"
+                    app:layout_constraintTop_toTopOf="@id/select_image2"
+                    app:layout_constraintVertical_bias="0.2" />
 
                 <ImageView
                     android:id="@+id/select_image2"
                     android:layout_width="match_parent"
                     android:layout_height="250dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/custom_edittext"
                     android:padding="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
