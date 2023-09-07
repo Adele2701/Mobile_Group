@@ -7,10 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -54,17 +52,23 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class addDriverDetailsFragment extends Fragment {
 
-    private TextView ID, errorMsg, errorMsg2, resultTV;
+    private TextView ID, show, errorMsg, errorMsg2;
     private ImageButton loadImageBtn, loadImageBtn2, snapImageBtn, snapImageBtn2;
     private Button confirmBtn;
     private ImageView displayImage, displayImage2;
-    private DatabaseReference userRef;
+    private DatabaseReference userRef, imgRef;
     private Drawable drawable, drawable2;
     private Uri targetUri, targetUri2;
-    private byte[] imgByte, imgByte2;
+    private byte[] byte1, byte2;
 
     static final int REQUEST_IMAGE_CAPTURE = 3;
     static final int REQUEST_IMAGE_CAPTURE2 = 4;
@@ -76,11 +80,15 @@ public class addDriverDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_add_driver_details, container, false);
+        int orientation = getResources().getConfiguration().orientation;
+        int layoutResId = (orientation == Configuration.ORIENTATION_LANDSCAPE) ?
+                R.layout.fragment_add_driver_details_land : R.layout.fragment_add_driver_details;
 
-        CardView view = rootView.findViewById(R.id.cardView);
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(layoutResId, container, false);
+
         ID = rootView.findViewById(R.id.driverID);
+        show = rootView.findViewById(R.id.show);
         errorMsg = rootView.findViewById(R.id.message);
         loadImageBtn = rootView.findViewById(R.id.choose);
         snapImageBtn = rootView.findViewById(R.id.camera);
@@ -97,28 +105,56 @@ public class addDriverDetailsFragment extends Fragment {
         //display driverID and retrieve image, continue from last fragment
         Bundle bundle = getArguments();
         if (bundle != null) {
-            ID.setText("ID: " + bundle.getString("driverID"));
+            String driver = bundle.getString("driverID");
+            ID.setText("ID: " + driver);
             String userId = bundle.getString("users");
 
             userRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("driverID");
+            imgRef = userRef.child('-' + driver).child("imagesDetails");
 
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
 
-                    if (snapshot.exists()) {
-                        for (DataSnapshot driverSnapshot : snapshot.getChildren()) {
-                            String drvLicenseURLFromDB = driverSnapshot.child("licenseUrl").getValue(String.class);
-                            String roadTaxURLFromDB = driverSnapshot.child("roadtaxUrl").getValue(String.class);
-                            String drvLicenseSnapURLFromDB = driverSnapshot.child("licenseByte").getValue(String.class);
-                            String roadTaxSnapURLFromDB = driverSnapshot.child("roadtaxByte").getValue(String.class);
+                    imgRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                for (DataSnapshot imageSnapshot : snapshot.getChildren()) {
 
-                            Picasso.get().load(drvLicenseURLFromDB).into(displayImage);
-                            Picasso.get().load(roadTaxURLFromDB).into(displayImage2);
-                            Picasso.get().load(drvLicenseSnapURLFromDB).into(displayImage);
-                            Picasso.get().load(roadTaxSnapURLFromDB).into(displayImage2);
+                                    String drvLicenseURLFromDB = imageSnapshot.child("licenseUrl").getValue(String.class);
+                                    String roadTaxURLFromDB = imageSnapshot.child("roadtaxUrl").getValue(String.class);
+                                    String drvLicenseSnapURLFromDB = imageSnapshot.child("licenseByte").getValue(String.class);
+                                    String roadTaxSnapURLFromDB = imageSnapshot.child("roadtaxByte").getValue(String.class);
+
+                                    if (drvLicenseURLFromDB == null) {
+                                        Picasso.get().load(drvLicenseSnapURLFromDB).into(displayImage);
+                                        if (roadTaxURLFromDB == null) {
+                                            Picasso.get().load(roadTaxSnapURLFromDB).into(displayImage2);
+                                        } else if (roadTaxSnapURLFromDB == null) {
+                                            Picasso.get().load(roadTaxURLFromDB).into(displayImage2);
+                                        }
+                                    } else if (drvLicenseSnapURLFromDB == null) {
+                                        Picasso.get().load(drvLicenseURLFromDB).into(displayImage);
+                                        if (roadTaxURLFromDB == null) {
+                                            Picasso.get().load(roadTaxSnapURLFromDB).into(displayImage2);
+                                        } else if (roadTaxSnapURLFromDB == null) {
+                                            Picasso.get().load(roadTaxURLFromDB).into(displayImage2);
+                                        }
+                                    }
+                                }
+
+                            } else {
+                                DatabaseReference dummy = imgRef.push();
+                                dummy.child("uriLicense").setValue("");
+                            }
                         }
-                    }
+
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                        }
+                    });
+
                 }
 
                 @Override
@@ -181,77 +217,115 @@ public class addDriverDetailsFragment extends Fragment {
                         public void onDataChange(DataSnapshot snapshot) {
 
                             if (snapshot.exists()) {
-                                for (DataSnapshot driverSnapshot : snapshot.getChildren()) {
-                                    String driverId = driverSnapshot.getKey();
+                                DataSnapshot shot = snapshot.getChildren().iterator().next();
+                                String driverId = shot.getKey();
 
-                                    drawable = displayImage.getDrawable();
-                                    drawable2 = displayImage2.getDrawable();
+                                imgRef.child(driverId).child("imagesDetails");
 
-                                    String drvLicenseUriFromDB = driverSnapshot.child("uriLicense").getValue(String.class);
-                                    String roadTaxUriFromDB = driverSnapshot.child("uriRoadtax").getValue(String.class);
-                                    String drvLicenseByteFromDB = driverSnapshot.child("byteLicense").getValue(String.class);
-                                    String roadTaxByteFromDB = driverSnapshot.child("byteRoadtax").getValue(String.class);
+                                String uri = pref.getString("targetUri", "");
+                                String uri2 = pref.getString("targetUri2", "");
+                                String img = pref.getString("imgByte", "");
+                                String img2 = pref.getString("imgByte2", "");
 
-                                    String uri = pref.getString("targetUri", "");
-                                    String uri2 = pref.getString("targetUri2", "");
-                                    String img = pref.getString("imgByte", "");
-                                    String img2 = pref.getString("imgByte", "");
+                                drawable = displayImage.getDrawable();
+                                drawable2 = displayImage2.getDrawable();
 
-                                    ID.setText(imgByte + " OMG " + imgByte2);
+                                imgRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot snapshot) {
+                                        if (snapshot.exists()) {
+                                            for (DataSnapshot imageSnapshot : snapshot.getChildren()) {
+                                                String imgDid = imageSnapshot.getKey();
 
-                                    if (drawable == null) {
-                                        errorMsg.setVisibility(View.VISIBLE);
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                errorMsg.setVisibility(View.GONE);
+                                                String drLUriFromDB = imageSnapshot.child("uriLicense").getValue(String.class);
+                                                String roTUriFromDB = imageSnapshot.child("uriRoadtax").getValue(String.class);
+                                                String drLByteFromDB = imageSnapshot.child("byteLicense").getValue(String.class);
+                                                String roTByteFromDB = imageSnapshot.child("byteRoadtax").getValue(String.class);
+
+                                                Toast msg = Toast.makeText(requireContext(), "Driver License Successfully Updated", Toast.LENGTH_SHORT);
+
+                                                if (drawable == null && drawable2 == null) {
+                                                    errorMsg.setVisibility(View.VISIBLE);
+                                                    errorMsg2.setVisibility(View.VISIBLE);
+                                                    new Handler().postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            errorMsg.setVisibility(View.GONE);
+                                                            errorMsg2.setVisibility(View.GONE);
+                                                        }
+                                                    }, 2000);
+                                                } else {
+                                                    if ((uri.equals("") || uri2.equals("")) && !uri.equals(drLUriFromDB) && !uri2.equals(roTUriFromDB)) {
+                                                        detectText(targetUri, null);
+                                                        saveImageToDatabase(targetUri, null, imgDid, "uriLicense");
+                                                        saveImageToDatabase(targetUri2, null, imgDid, "uriRoadtax");
+                                                        ID.setText("1");
+                                                        msg.show();
+
+                                                    } else if ((img.equals("") || img2.equals("")) && !img.equals(drLByteFromDB) && !img2.equals(roTByteFromDB)) {
+                                                        detectText(null, byte1);
+                                                        saveImageToDatabase(null, byte1, imgDid, "byteLicense");
+                                                        saveImageToDatabase(null, byte2, imgDid, "byteRoadtax");
+                                                        ID.setText("2");
+                                                        msg.show();
+
+                                                    } else if ((uri.equals("") || img2.equals("")) && !uri.equals(drLUriFromDB) && !img2.equals(roTByteFromDB)) {
+                                                        detectText(targetUri, null);
+                                                        saveImageToDatabase(targetUri, null, imgDid, "uriLicense");
+                                                        saveImageToDatabase(null, byte2, imgDid, "byteRoadtax");
+                                                        ID.setText("3");
+                                                        msg.show();
+
+                                                    } else if ((img.equals("") || uri2.equals("")) && !img.equals(drLByteFromDB) && !uri2.equals(roTUriFromDB)) {
+                                                        detectText(null, byte1);
+                                                        saveImageToDatabase(null, byte1, imgDid, "byteLicense");
+                                                        saveImageToDatabase(targetUri2, null, imgDid, "uriRoadtax");
+                                                        ID.setText("4");
+                                                        msg.show();
+
+                                                    } else if (uri.equals("") && !uri.equals(drLUriFromDB)) {
+                                                        detectText(targetUri, null);
+                                                        saveImageToDatabase(targetUri, null, imgDid, "uriLicense");
+                                                        ID.setText("5");
+                                                        msg.show();
+                                                    } else if (img.equals("") && !img.equals(drLByteFromDB)) {
+                                                        detectText(null, byte1);
+                                                        saveImageToDatabase(null, byte1, imgDid, "byteLicense");
+                                                        ID.setText("6");
+                                                        msg.show();
+
+                                                    } else if (uri2.equals("") && !uri2.equals(roTUriFromDB)) {
+                                                        saveImageToDatabase(targetUri2, null, imgDid, "uriRoadtax");
+                                                        ID.setText("7");
+                                                        msg.show();
+
+                                                    } else if (img2.equals("") && !img2.equals(roTByteFromDB)) {
+                                                        saveImageToDatabase(null, byte2, imgDid, "byteRoadtax");
+                                                        ID.setText("8");
+                                                        msg.show();
+
+                                                    } else {
+                                                        Toast.makeText(requireContext(), "No changes found", Toast.LENGTH_SHORT).show();
+
+                                                    }
+                                                }
                                             }
-                                        }, 2000);
-                                    } else if (drawable2 == null) {
-                                        errorMsg2.setVisibility(View.VISIBLE);
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                errorMsg2.setVisibility(View.GONE);
-                                            }
-                                        }, 2000);
-                                    } else if (!uri.equals(drvLicenseUriFromDB) && !uri2.equals(roadTaxUriFromDB)
-                                            || !img.equals(drvLicenseByteFromDB) && !img2.equals(roadTaxByteFromDB)) {
-
-                                        saveImageToDatabase(targetUri, imgByte, driverId, "uriLicense");
-                                        saveImageToDatabase(targetUri2, imgByte2, driverId, "uriRoadtax");
-                                        saveImageToDatabase(targetUri, imgByte, driverId, "byteLicense");
-                                        saveImageToDatabase(targetUri2, imgByte2, driverId, "byteRoadtax");
-                                        Toast.makeText(requireContext(), "Driver License Successfully Updated", Toast.LENGTH_SHORT).show();
-
-                                    } else if (!uri.equals(drvLicenseUriFromDB) || !img.equals(drvLicenseByteFromDB)) {
-
-                                        saveImageToDatabase(targetUri, imgByte, driverId, "uriLicense");
-                                        saveImageToDatabase(targetUri, imgByte, driverId, "byteLicense");
-                                        Toast.makeText(requireContext(),"Driver License Successfully Updated", Toast.LENGTH_SHORT).show();
-
-                                    } else if (!uri2.equals(roadTaxUriFromDB) || !img2.equals(roadTaxByteFromDB)) {
-
-                                        saveImageToDatabase(targetUri2, imgByte2, driverId, "uriRoadtax");
-                                        saveImageToDatabase(targetUri2, imgByte2, driverId, "byteRoadtax");
-                                        Toast.makeText(requireContext(), "Driver License Successfully Updated", Toast.LENGTH_SHORT).show();
-
-                                    } else {
-                                        Toast.makeText(requireContext(), "No changes found", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
-                                }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError error) {}
+                                });
                             }
                         }
 
                         @Override
-                        public void onCancelled(DatabaseError error) {
-                        }
+                        public void onCancelled(DatabaseError error) {}
                     });
                 }
             }
         });
         return rootView;
-
     }
 
     @Override
@@ -267,6 +341,7 @@ public class addDriverDetailsFragment extends Fragment {
                     displayImage.setImageBitmap(bitmap);
 
                     editor.putString("targetUri", targetUri.toString());
+                    editor.remove("imgByte");
                     editor.apply();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -279,6 +354,7 @@ public class addDriverDetailsFragment extends Fragment {
                     displayImage2.setImageBitmap(bitmap);
 
                     editor.putString("targetUri2", targetUri2.toString());
+                    editor.remove("imgByte2");
                     editor.apply();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -291,9 +367,11 @@ public class addDriverDetailsFragment extends Fragment {
 
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                        byte[] imgByte = stream.toByteArray();
+                        byte1 = stream.toByteArray();
+                        String imgByte = Base64.getEncoder().encodeToString(byte1);
 
-                        editor.putString("imgByte", imgByte.toString());
+                        editor.putString("imgByte", imgByte);
+                        editor.remove("targetUri");
                         editor.apply();
                     }
                 }
@@ -305,9 +383,11 @@ public class addDriverDetailsFragment extends Fragment {
 
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                        byte[] imgByte2 = stream.toByteArray();
+                        byte2 = stream.toByteArray();
+                        String imgByte2 = Base64.getEncoder().encodeToString(byte2);
 
-                        editor.putString("imgByte2", imgByte2.toString());
+                        editor.putString("imgByte2", imgByte2);
+                        editor.remove("targetUri2");
                         editor.apply();
                     }
                 }
@@ -315,6 +395,7 @@ public class addDriverDetailsFragment extends Fragment {
         }
     }
 
+    //camera functions
     private boolean checkPermission() {
         int camPermission = ContextCompat.checkSelfPermission(requireContext(), CAMERA);
         return camPermission == PackageManager.PERMISSION_GRANTED;
@@ -339,46 +420,77 @@ public class addDriverDetailsFragment extends Fragment {
         }
     }
 
-    private void detectText(Uri imageUri) {
+    //check validity of license
+    private void detectText(Uri imageUri, byte[] bytes) {
         InputImage image = null;
         try {
-            image = InputImage.fromFilePath(requireContext(), imageUri);
+            if (imageUri != null) {
+                image = InputImage.fromFilePath(requireContext(), imageUri);
+            } else if (bytes != null) {
+                Bitmap bitM = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                image = InputImage.fromBitmap(bitM, 0);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-        Task<Text> result = recognizer.process(image)
-                .addOnSuccessListener(new OnSuccessListener<Text>() {
-                    @Override
-                    public void onSuccess(@NotNull Text text) {
-                        StringBuilder result = new StringBuilder();
-                        for (Text.TextBlock block : text.getTextBlocks()) {
-                            String blockText = block.getText();
-                            Point[] blockCornerPoint = block.getCornerPoints();
-                            Rect blockFrame = block.getBoundingBox();
-                            for (Text.Line line : block.getLines()) {
-                                String lineText = line.getText();
-                                Point[] lineCornerPoints = line.getCornerPoints();
-                                Rect lineFrame = line.getBoundingBox();
-                                for (Text.Element element : line.getElements()) {
-                                    String elementText = element.getText();
-                                    result.append(elementText);
-                                }
 
-                                resultTV.setText(blockText);
+        if (image != null) {
+            TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+            Task<Text> result = recognizer.process(image)
+                    .addOnSuccessListener(new OnSuccessListener<Text>() {
+                        @Override
+                        public void onSuccess(@NotNull Text text) {
+                            StringBuilder result = new StringBuilder();
+                            for (Text.TextBlock block : text.getTextBlocks()) {
+                                String blockText = block.getText();
+                                result.append(blockText).append(" "); //append block text with a space
+
+                                Pattern datePattern = Pattern.compile("\\b(\\d{2}/\\d{2}/\\d{4})\\b");
+                                Matcher matcher = datePattern.matcher(result.toString());
+
+                                Date currentDate = new Date(); //get current date
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                while (matcher.find()) {
+                                    String date = matcher.group();
+                                    String dateform = dateFormat.format(currentDate);
+
+                                    try {
+                                        Date date1 = dateFormat.parse(dateform);
+                                        Date date2 = dateFormat.parse(date);
+
+                                        if (date1.before(date2)) {
+                                            show.setVisibility(View.VISIBLE);
+                                            show.setText("Valid license!");
+                                        } else if (date1.after(date2)) {
+                                            show.setVisibility(View.VISIBLE);
+                                            show.setText("Invalid license! Exceed: " + date);
+                                        } else {
+                                            show.setVisibility(View.INVISIBLE);
+                                        }
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            show.setVisibility(View.GONE);
+                                        }
+                                    }, 4000);
+                                }
                             }
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NotNull Exception e) {
-                        Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NotNull Exception e) {
+                            Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 
-    private void saveImageToDatabase(Uri imageUri, byte[] imageByte, String driverId, String uriKey) {
+    private void saveImageToDatabase(Uri imageUri, byte[] imageByte, String imgDid, String
+            uriKey) {
 
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         String imageName;
@@ -399,63 +511,69 @@ public class addDriverDetailsFragment extends Fragment {
 
         UploadTask uploadTask;
 
-        if (imageUri != null && imageByte == null) {
+        if (imageUri != null) {
             uploadTask = imageRef.putFile(imageUri);
-        } else if (imageByte != null && imageUri == null) {
+        } else if (imageByte != null) {
             uploadTask = imageRef.putBytes(imageByte);
         } else {
-            Toast.makeText(requireContext(), "Nothing to update!", Toast.LENGTH_SHORT).show();
             uploadTask = null;
         }
 
-        //download images URL and uri to keep in database
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    public void onSuccess(Uri downloadUrl) {
+        if (uploadTask != null) {
+            //download images URL, keep it and uri in DB
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        public void onSuccess(Uri downloadUrl) {
 
-                        DatabaseReference childRef = userRef.child(driverId);
+                            DatabaseReference childRef = imgRef.child(imgDid);
 
-                        if (uriKey.equals("uriLicense")) {
-                            childRef.child("licenseUrl").setValue(downloadUrl.toString());
-                            childRef.child(uriKey).setValue(imageUri.toString());
+                            if (uriKey.equals("uriLicense") && imageByte == null) {
+                                childRef.child("licenseUrl").setValue(downloadUrl.toString());
+                                childRef.child(uriKey).setValue(imageUri.toString());
 
-                            childRef.child("licenseByte").removeValue();
+                                childRef.child("licenseByte").removeValue();
+                                childRef.child("byteLicense").removeValue();
 
-                        } else if (uriKey.equals("uriRoadtax")) {
-                            childRef.child("roadtaxUrl").setValue(downloadUrl.toString());
-                            childRef.child(uriKey).setValue(imageUri.toString());
+                            } else if (uriKey.equals("uriRoadtax") && imageByte == null) {
+                                childRef.child("roadtaxUrl").setValue(downloadUrl.toString());
+                                childRef.child(uriKey).setValue(imageUri.toString());
 
-                            childRef.child("roadtaxByte").removeValue();
+                                childRef.child("roadtaxByte").removeValue();
+                                childRef.child("byteRoadtax").removeValue();
 
-                        } else if (uriKey.equals("byteLicense")) {
-                            childRef.child("licenseByte").setValue(downloadUrl.toString());
-                            childRef.child(uriKey).setValue(imageByte.toString());
+                            } else if (uriKey.equals("byteLicense") && imageUri == null) {
+                                childRef.child("licenseByte").setValue(downloadUrl.toString());
+                                String imgByte = Base64.getEncoder().encodeToString(imageByte);
+                                childRef.child(uriKey).setValue(imgByte);
 
-                            childRef.child("licenseUrl").removeValue();
+                                childRef.child("licenseUrl").removeValue();
+                                childRef.child("uriLicense").removeValue();
 
-                        } else if (uriKey.equals("byteRoadtax")) {
-                            childRef.child("roadtaxByte").setValue(downloadUrl.toString());
-                            childRef.child(uriKey).setValue(imageByte.toString());
+                            } else if (uriKey.equals("byteRoadtax") && imageUri == null) {
+                                childRef.child("roadtaxByte").setValue(downloadUrl.toString());
+                                String imgByte2 = Base64.getEncoder().encodeToString(imageByte);
+                                childRef.child(uriKey).setValue(imgByte2);
 
-                            childRef.child("roadtaxUrl").removeValue();
-
+                                childRef.child("roadtaxUrl").removeValue();
+                                childRef.child("uriRoadtax").removeValue();
+                            }
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NotNull Exception e) {
-                        Toast.makeText(requireContext(), "Failed to download URL " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NotNull Exception e) {
-                        Toast.makeText(requireContext(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NotNull Exception e) {
+                            Toast.makeText(requireContext(), "Failed to download URL " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NotNull Exception e) {
+                            Toast.makeText(requireContext(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 }
