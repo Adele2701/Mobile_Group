@@ -160,7 +160,7 @@ public class editDriverProfileFragment extends Fragment {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
                 bundle.putString("users", userRef.getParent().getKey());
-                bundle.putString("driverID", ID.getText().toString().substring(3));
+                bundle.putString("driverID", ID.getText().toString().substring(4));
 
                 addDriverDetailsFragment addDriverDetailsFragment = new addDriverDetailsFragment();
                 addDriverDetailsFragment.setArguments(bundle);
