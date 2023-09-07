@@ -125,7 +125,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Car Insurance:"
+                    android:text="Road tax:"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"
                     app:layout_constraintTop_toBottomOf="@id/message" />
