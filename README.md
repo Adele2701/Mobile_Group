@@ -1,5 +1,6 @@
 ## Group assignment - CarPool Application for Utarian
 ### Feature: Driver verification 
+  - [Figma](https://www.figma.com/) for prototyping
   - Text detection on driving license using ML Kit.
   - Validate expiry date.
   - Verify insurance information.
